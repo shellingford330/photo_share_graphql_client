@@ -3,6 +3,16 @@ import { Query, Mutation } from 'react-apollo'
 import { ROOT_QUERY } from './App'
 import { gql } from 'apollo-boost'
 
+const updateUserCache = (cache, { data: { addFakeUsers } }) => {
+  let data = cache.readQuery({ query: ROOT_QUERY })
+  data.totalUsers += addFakeUsers.length
+  data.allUsers = [
+    ...data.allUsers,
+    ...data.addFakeUsers
+  ]
+  cache.writeQury({ query: ROOT_QUERY, data })
+}
+
 const Users = () =>
   <Query query={ROOT_QUERY}>
     {
@@ -18,7 +28,7 @@ const UserList = ({ count, users, refetchUsers }) =>
         <button onClick={() => refetchUsers()}>Refetch Users</button>
         <Mutation mutation={ADD_FAKE_USERS_MUTATION} 
           variables={{count: 1}}
-          refetchQueries={[{ query: ROOT_QUERY }]}>
+          update={updateUserCache}refetchQueries={[{ query: ROOT_QUERY }]}>
           {
             addFakeUsers =>
               <button onClick={addFakeUsers}>Add Fake Users</button>

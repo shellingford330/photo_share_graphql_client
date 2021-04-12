@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Query, Mutation } from 'react-apollo'
+import { Query, Mutation, withApollo } from 'react-apollo'
+import { compose } from 'recompose'
 import { ROOT_QUERY } from './App'
 import { gql } from 'apollo-boost'
 
@@ -80,4 +81,4 @@ class AuthorizedUser extends Component {
     }
 }
 
-export default withRouter(AuthorizedUser)   
+export default compose(withApollo, withRouter)(AuthorizedUser)   
