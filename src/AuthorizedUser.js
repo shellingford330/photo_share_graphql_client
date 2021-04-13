@@ -19,9 +19,8 @@ const CurrentUser = ({ name, avatar, logout }) =>
     </div>
 
 const Me = ({ logout, requestCode, signingIn }) =>
-    <Query query={ROOT_QUERY}>
-        {
-          ({ loading, data }) => data.me ?
+    <Query query={ROOT_QUERY} fetchPolicy="cache-only">
+        {({ loading, data }) => data.me ?
             <CurrentUser {...data.me} logout={logout} /> :
             loading ?
                 <p>loading... </p> :
