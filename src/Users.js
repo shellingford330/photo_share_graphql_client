@@ -3,18 +3,28 @@ import { Query, Mutation } from 'react-apollo'
 import { ROOT_QUERY } from './App'
 import { gql } from 'apollo-boost'
 
+const ADD_FAKE_USERS_MUTATION = gql`
+  mutation addFakeUsers($count: Int!) {
+    addFakeUsers(count: $count) {
+      githubLogin
+      name
+      avatar
+    }
+  }
+`
+
 const updateUserCache = (cache, { data: { addFakeUsers } }) => {
   let data = cache.readQuery({ query: ROOT_QUERY })
   data.totalUsers += addFakeUsers.length
   data.allUsers = [
     ...data.allUsers,
-    ...data.addFakeUsers
+    ...addFakeUsers
   ]
-  cache.writeQury({ query: ROOT_QUERY, data })
+  cache.writeQuery({ query: ROOT_QUERY, data })
 }
 
 const Users = () =>
-  <Query query={ROOT_QUERY}>
+  <Query query={ROOT_QUERY} fetchPolicy="cache-and-network">
     {
       ({ data, loading, refetch }) => loading ?
         <p>loading users...</p> :
@@ -28,7 +38,7 @@ const UserList = ({ count, users, refetchUsers }) =>
         <button onClick={() => refetchUsers()}>Refetch Users</button>
         <Mutation mutation={ADD_FAKE_USERS_MUTATION} 
           variables={{count: 1}}
-          update={updateUserCache}refetchQueries={[{ query: ROOT_QUERY }]}>
+          update={updateUserCache}>
           {
             addFakeUsers =>
               <button onClick={addFakeUsers}>Add Fake Users</button>
@@ -48,15 +58,5 @@ const UserListItem = ({ name, avatar }) =>
         <img src={avatar} width={48} height={48} alt='' />
         {name}
       </li>
-
-const ADD_FAKE_USERS_MUTATION = gql`
-  mutation addFakeUsers($count: Int!) {
-    addFakeUsers(count: $count) {
-      githubLogin
-      name
-      avatar
-    }
-  }
-`
 
 export default Users
